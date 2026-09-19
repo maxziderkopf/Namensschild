@@ -121,8 +121,9 @@ function seiteForm(){
            hint:'' })
     ]),
     U.gruppe('Tiefe und Fluchtpunkt', [
-      U.feldRange(cfg, 'koerper.tiefe', 'Tiefe', {
-        onChange:()=>aenderung(), aktiv:()=>!platteAn(),
+      // Bei der Grundplatte ergibt sich die Tiefe aus der Platte selbst
+      platteAn() ? null : U.feldRange(cfg, 'koerper.tiefe', 'Tiefe', {
+        onChange:()=>aenderung(),
         hint:'Wie weit der Buchstabe von der Wand absteht.'
       }),
       U.feldRange(cfg, 'koerper.geradeTiefe', 'Gerader Auszug', {
@@ -142,7 +143,7 @@ function seiteForm(){
         hint:'Wie stark die Rückfläche gegenüber der Front verkleinert wird.'
       })
     ]),
-    U.gruppe('Kanten und Wandstärken', [
+    U.gruppe('Kanten und Passung', [
       U.feldChoices(cfg, 'koerper.kanten', 'Kanten', [
         { id:'eckig', name:'Eckig' },
         { id:'rund', name:'Abgerundet' }
@@ -153,14 +154,6 @@ function seiteForm(){
             hint:'Wird in Fusion ganz zum Schluss gesetzt, in kleinen Gruppen.'
           })
         : null,
-      U.feldRange(cfg, 'koerper.wandstaerke', 'Wandstärke', {
-        onChange:()=>aenderung(), dez:1,
-        hint:'Wand der Schale. Bestimmt zusammen mit der Strichstärke, wie breit der Kanal für die LEDs wird.'
-      }),
-      U.feldRange(cfg, 'koerper.frontDicke', 'Dicke der Frontfläche', {
-        onChange:()=>aenderung(), dez:1,
-        hint:'Dicker streut mehr, schluckt aber Licht. 2 mm sind ein guter Start.'
-      }),
       U.feldRange(cfg, 'koerper.passung', 'Passungsspiel', {
         onChange:()=>aenderung(), dez:2,
         hint:'Gesamtspiel der Presspassung. 0,07 mm hat sich bei dir bewährt.'
@@ -176,8 +169,6 @@ function seiteForm(){
       cfg.platte.form === 'abgerundet'
         ? U.feldRange(cfg, 'platte.eckRadius', 'Eckradius', { onChange:()=>aenderung(), dez:0 })
         : null,
-      U.feldRange(cfg, 'platte.dicke', 'Plattendicke', { onChange:()=>aenderung(), dez:1 }),
-      U.feldRange(cfg, 'platte.diffusorDicke', 'Diffusorplatte', { onChange:()=>aenderung(), dez:1 }),
       U.feldToggle(cfg, 'platte.stege', 'Stege für freistehende Inseln', {
         onChange:()=>aenderung(true),
         hint:'Bei A, O, R, B fällt die Mitte sonst aus der Platte. Die App setzt die Stege automatisch.'
@@ -256,41 +247,16 @@ function seiteLed(){
 
 function seiteDruck(){
   return [
-    U.gruppe('Drucker', [
-      U.feldSelect(cfg, 'druck.drucker', 'Modell', C.DRUCKER.map(d => ({ id:d.id, name:d.name })), {
-        onChange:()=>{
-          const d = C.DRUCKER.find(x => x.id === cfg.druck.drucker);
-          if (d){ cfg.druck.bettX = d.x; cfg.druck.bettY = d.y; cfg.druck.bettZ = d.z; }
-          aenderung(true);
-        },
-        dynHint:()=>{
-          const d = C.DRUCKER.find(x => x.id === cfg.druck.drucker);
-          return d ? `Druckraum ${d.x} × ${d.y} × ${d.z} mm` : '';
-        }
-      }),
-      U.feldRange(cfg, 'druck.rand', 'Sicherheitsabstand', {
-        onChange:()=>aenderung(), dez:0,
-        hint:'Abstand zur Bettkante, den die App freilässt.'
-      })
-    ]),
-    U.gruppe('Teilung', [
-      U.feldToggle(cfg, 'druck.teilen', 'Zu große Teile automatisch aufteilen', {
-        onChange:()=>aenderung(true),
-        hint:'Teilt zu große Teile in ein Raster und plant Passstifte ein. Maße stehen im Export.'
-      }),
-      cfg.druck.teilen ? U.feldRange(cfg, 'druck.stiftD', 'Passstift Ø', { onChange:()=>aenderung(), dez:1 }) : null,
-      cfg.druck.teilen ? U.feldRange(cfg, 'druck.stiftL', 'Passstift Länge', {
-        onChange:()=>aenderung(), dez:0, hint:'Je Hälfte die Hälfte davon.'
-      }) : null,
-      U.readout('Was aufs Bett kommt', () => {
+    U.gruppe('Was aufs Druckbett kommt', [
+      U.readout(null, () => {
         if (!model?.teilung) return [];
         return model.teilung.map(t => [
           t.name,
-          t.passt ? `${t.bb.w} × ${t.bb.h} mm` : (t.geteilt ? `${t.teile} Stücke` : 'passt nicht'),
-          t.passt ? 'good' : (t.geteilt ? 'mid' : 'bad')
+          t.passt ? `${t.bb.w} × ${t.bb.h} mm` : `${t.teile} Stücke`,
+          t.passt ? 'good' : 'mid'
         ]);
       })
-    ].filter(Boolean)),
+    ], 'Gerechnet für den Bambu Lab P1S. Zu große Teile teilt die App automatisch und plant Passstifte ein — die Maße stehen im Export.'),
     U.gruppe('Montage an der Wand', [
       U.feldChoices(cfg, 'montage', 'Art', C.MONTAGE.map(m => ({ id:m.id, name:m.name })), {
         stil:'grid2', onChange:()=>aenderung(true),

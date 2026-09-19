@@ -11,14 +11,17 @@ const V = THREE.MathUtils;
 export class Vorschau {
   constructor(canvas){
     this.canvas = canvas;
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:false, powerPreference:'high-performance' });
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true, powerPreference:'high-performance' });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
 
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color('#0d0d10');
+    // Kein Szenen-Hintergrund: der helle Farbverlauf wie in Fusion kommt
+    // per CSS vom Viewport und scheint durch den transparenten Canvas.
+    this.scene.background = null;
+    this.renderer.setClearColor(0x000000, 0);
 
     this.camera = new THREE.PerspectiveCamera(38, 1, 1, 8000);
     this.camera.position.set(0, 0, 400);
@@ -56,7 +59,7 @@ export class Vorschau {
 
   /* ---------------- Beleuchtung der Szene (nicht die LEDs) ---------------- */
   lichter(){
-    this.scene.add(new THREE.HemisphereLight('#8090a8', '#101014', 0.55));
+    this.scene.add(new THREE.HemisphereLight('#ffffff', '#8a8f98', 0.9));
     const key = new THREE.DirectionalLight('#ffffff', 1.5);
     key.position.set(120, 180, 240);
     this.scene.add(key);
@@ -70,9 +73,13 @@ export class Vorschau {
 
   wandBauen(){
     const geo = new THREE.PlaneGeometry(1, 1);
-    this.wandMat = new THREE.MeshStandardMaterial({ color:'#20202a', roughness:0.95, metalness:0 });
+    this.wandMat = new THREE.MeshStandardMaterial({ color:'#e2e5ea', roughness:0.95, metalness:0 });
     this.wand = new THREE.Mesh(geo, this.wandMat);
     this.scene.add(this.wand);
+
+    // Bodenraster wie in Fusion: 10-mm-Kaestchen, jede 10. Linie kraeftiger
+    this.boden = new THREE.Group();
+    this.scene.add(this.boden);
   }
 
   /* ---------------- Modell aufbauen ---------------- */
@@ -196,6 +203,19 @@ export class Vorschau {
     this.wand.scale.set(s, s, 1);
     this.wand.position.set(mitte.x, mitte.y, -tiefe - 1.2);
 
+    // Boden 60 mm unter dem Schild, beginnt an der Wand und laeuft nach vorn
+    this.boden.traverse(o => { o.geometry?.dispose(); o.material?.dispose(); });
+    this.boden.clear();
+    const feld = Math.ceil(s / 100) * 100;
+    const fein = new THREE.GridHelper(feld, feld / 10, '#c4c8cf', '#c4c8cf');
+    const grob = new THREE.GridHelper(feld, feld / 100, '#9ba1aa', '#9ba1aa');
+    for (const g of [fein, grob]){
+      g.material.transparent = true;
+      g.material.opacity = g === fein ? 0.55 : 0.9;
+      g.position.set(mitte.x, box.min.y - 60, -tiefe - 1.2 + feld / 2);
+      this.boden.add(g);
+    }
+
     // Nah- und Fernebene eng an das Modell legen — je kleiner der Abstand
     // zwischen beiden, desto feiner loest der Tiefenpuffer auf.
     this.camera.near = Math.max(0.5, this.radius / 60);
@@ -231,6 +251,7 @@ export class Vorschau {
   /* ---------------- Sichtbarkeit ---------------- */
   aktualisiereSichtbarkeit(){
     this.wand.visible = this.zeigeWand;
+    this.boden.visible = this.zeigeWand;
     this.teilungsGruppe.visible = this.zeigeTeilung;
   }
 

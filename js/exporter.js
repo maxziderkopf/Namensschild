@@ -252,8 +252,8 @@ export function baueAnleitung(cfg, model, lay, json){
       `     Damit bleibt hinten eine Rückwand von ${n1(k.wandstaerke)} mm stehen und der`,
       `     Hohlraum ist ${n1(k.tiefe - k.wandstaerke)} mm tief.`,
       '4.3  Shell schlägt fehl, wenn der Buchstabe an einer Stelle dünner ist als',
-      '     die doppelte Wandstärke. Dann Schrift größer, Wandstärke kleiner oder',
-      '     Strichstärke erhöhen — die App warnt bereits vorher.',
+      '     die doppelte Wandstärke. Dann Schrift größer oder Strichstärke',
+      '     erhöhen — die App warnt bereits vorher.',
       '     >>> Prüfen: von hinten reinschauen, ist der Hohlraum durchgehend?', '');
   } else {
     p('4. AUSHÖHLEN (Shell)', linie('-'),

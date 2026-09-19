@@ -3,7 +3,7 @@
    Alle Laengen in Millimetern, alle Winkel in Grad.
    ============================================================ */
 
-export const APP_VERSION = '1.0.0';
+export const APP_VERSION = '1.1.0';
 export const SCHEMA_VERSION = 1;
 const LS_KEY = 'namensschild.config.v1';
 
@@ -94,6 +94,20 @@ export const DRUCKER = [
   { id:'ender3',     name:'Creality Ender 3 / V2',    x:220, y:220, z:250 }
 ];
 
+/* ---------------- Feste Werte ----------------
+   Das stellt Max nicht selbst ein — das ergibt sich aus Druck und LED.
+   clampConfig() setzt sie bei jedem Laden neu, damit auch alte
+   Speicherstaende mit anderen Werten wieder auf Linie kommen.       */
+export const FEST = {
+  wandstaerke: 2.0,     // Wand der Buchstabenschale
+  plattenDicke: 20,     // Grundplatte: 3 mm Streifen + 15 mm Abstand zum Diffusor + 2 mm Boden
+  diffusorDicke: 0.8,   // Diffusor, laesst genug Licht durch und streut trotzdem
+  drucker: 'bambu-p1s', // Bambu Lab P1S, 256 x 256 x 256 mm
+  druckRand: 5,         // Sicherheitsabstand zur Bettkante
+  stiftD: 4,            // Passstift-Durchmesser
+  stiftL: 8             // Passstift-Laenge gesamt
+};
+
 /* ---------------- Werkseinstellung ---------------- */
 export function defaultConfig(){
   return {
@@ -118,8 +132,8 @@ export function defaultConfig(){
       verjuengung: 16,      // Verkleinerung der Rueckflaeche in %
       kanten: 'rund',       // eckig | rund
       kantenRadius: 1.5,
-      wandstaerke: 2.0,
-      frontDicke: 2.0,
+      wandstaerke: FEST.wandstaerke,
+      frontDicke: FEST.diffusorDicke,
       passung: 0.07,        // Spiel der Presspassung, bewaehrter Wert
       ueberstand: 0         // 0 = buendig, >0 = Front steht vor
     },
@@ -128,8 +142,8 @@ export function defaultConfig(){
       form: 'abgerundet',
       rand: 18,             // Abstand Text zu Plattenkante
       eckRadius: 12,
-      dicke: 8,
-      diffusorDicke: 2,
+      dicke: FEST.plattenDicke,
+      diffusorDicke: FEST.diffusorDicke,
       stege: true,
       stegBreite: 2.0,
       stegRichtung: 'senkrecht'
@@ -225,6 +239,15 @@ export function clampConfig(cfg){
     if (typeof v === 'number' && isFinite(v)) set(cfg, path, Math.min(lim.max, Math.max(lim.min, v)));
     else set(cfg, path, get(defaultConfig(), path));
   }
+  // feste Werte immer durchsetzen
+  const d = DRUCKER.find(x => x.id === FEST.drucker);
+  cfg.koerper.wandstaerke = FEST.wandstaerke;
+  cfg.platte.dicke = FEST.plattenDicke;
+  cfg.platte.diffusorDicke = FEST.diffusorDicke;
+  cfg.koerper.frontDicke = FEST.diffusorDicke;  // die Frontflaeche ist der Diffusor
+  Object.assign(cfg.druck, { drucker: d.id, bettX: d.x, bettY: d.y, bettZ: d.z,
+    rand: FEST.druckRand, teilen: true, stiftD: FEST.stiftD, stiftL: FEST.stiftL });
+
   // gerader Auszug kann nie tiefer sein als das ganze Teil
   if (cfg.koerper.geradeTiefe > cfg.koerper.tiefe) cfg.koerper.geradeTiefe = cfg.koerper.tiefe;
   // Kantenradius kann die Wand nicht uebersteigen

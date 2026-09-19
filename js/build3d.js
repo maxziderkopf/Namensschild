@@ -596,11 +596,11 @@ export function buildModel(cfg, lay){
   if (isFinite(engsteStelle) && engsteStelle < led.minKanal){
     warnungen.push({ art:'warn', text:
       `Der Hohlraum ist an der engsten Stelle nur etwa ${engsteStelle.toFixed(1)} mm breit. ` +
-      `Der ${led.kurz}-Streifen braucht ${led.minKanal} mm. Schrift größer, Wand dünner oder Strichstärke erhöhen.` });
+      `Der ${led.kurz}-Streifen braucht ${led.minKanal} mm. Schrift größer machen oder die Strichstärke erhöhen.` });
   }
   if (gruppenListe.some(g => !g.hohl)){
     warnungen.push({ art:'err', text:
-      `Bei dieser Größe bleibt kein Hohlraum übrig — die Wandstärke von ${k.wandstaerke} mm frisst den Buchstaben auf. Schrift vergrößern oder Wand dünner machen.` });
+      `Bei dieser Größe bleibt kein Hohlraum übrig — die ${k.wandstaerke} mm Wand frisst den Buchstaben auf. Schrift vergrößern oder die Strichstärke erhöhen.` });
   }
   if (!modus.animiert && modus.id !== 'statisch' && !led.adressierbar){
     // nur Hinweis, kein Fehler

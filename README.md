@@ -69,11 +69,11 @@ Dann `http://localhost:8731` im Browser öffnen.
 
 1. Text eintippen, Schrift und Größe wählen.
 2. Unter **Form** die Bauart festlegen — Einzelbuchstaben oder Grundplatte —
-   und Tiefe, Fluchtpunkt, Wandstärken einstellen.
+   und Tiefe, Fluchtpunkt und Kanten einstellen.
 3. Unter **Farbe** und **LED** das Aussehen festlegen. Die 3D-Ansicht zeigt
    sofort, wie es leuchtet. Ansicht drehen: ziehen. Zoomen: scrollen oder
    zwei Finger.
-4. Unter **Druck** deinen Drucker wählen. Ist ein Teil zu groß fürs Bett,
+4. Unter **Druck** siehst du, was aufs Druckbett kommt. Ist ein Teil zu groß,
    teilt die App es automatisch auf und plant Passstifte ein.
 5. Unter **Übersicht** stehen alle Einstellungen auf einen Blick.
 6. Oben rechts auf **Export**:
@@ -131,7 +131,20 @@ Zum Debuggen liegt das aktuelle Modell in der Browser-Konsole unter `NSK`:
 
 ---
 
-## 7. Grenzen der Vorschau
+## 7. Feste Werte
+
+Diese Maße stellt man bewusst nicht in der App ein. Sie stehen in
+`js/config.js` im Block `FEST` und lassen sich dort ändern:
+
+| Wert | Maß | Warum |
+|---|---|---|
+| Wandstärke der Buchstaben | 2 mm | stabil, druckt sauber |
+| Frontfläche und Diffusorplatte | 0,8 mm | lässt genug Licht durch und streut trotzdem |
+| Grundplatte | 20 mm | 3 mm Streifen + 15 mm Abstand zum Diffusor + 2 mm Boden |
+| Drucker | Bambu Lab P1S | 256 × 256 × 256 mm, 5 mm Rand |
+| Passstifte | Ø 4 mm, 8 mm lang | beim Teilen zu großer Teile |
+
+## 8. Grenzen der Vorschau
 
 * Die 3D-Ansicht rechnet die Konturen über ein feines Raster. An sehr spitzen
   Innenecken kann die Hohlraumkontur um bis zu etwa 0,2 mm abweichen. Für die
@@ -147,7 +160,7 @@ Zum Debuggen liegt das aktuelle Modell in der Browser-Konsole unter `NSK`:
 
 ---
 
-## 8. Was noch nicht drin ist
+## 9. Was noch nicht drin ist
 
 Fertig ist P1 aus der Aufgabenstellung. Noch offen sind unter anderem:
 Rand am Buchstaben, verbundene Buchstaben, Symbole, mehrere Zeilen, Bogen-
@@ -158,7 +171,7 @@ der Zufallsgenerator und der Verlegevorschlag für den LED-Streifen aus P3.
 
 ---
 
-## 9. Schriften
+## 10. Schriften
 
 Alle mitgelieferten Schriften stehen unter der SIL Open Font License 1.1:
 Montserrat, Poppins, Bebas Neue, Anton, Fredoka, Playfair Display, Pacifico,

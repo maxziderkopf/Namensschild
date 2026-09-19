@@ -4,7 +4,7 @@
    vollstaendig ohne Internet: Cache zuerst, Netz nur als Rueckfall.
    ============================================================ */
 
-const CACHE = 'namensschild-v1.0.0';
+const CACHE = 'namensschild-v1.1.0';
 
 const DATEIEN = [
   './',
