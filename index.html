@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Namensschild-Konfigurator</title>
+<meta name="description" content="Beleuchtete 3D-gedruckte Namensschilder konfigurieren und als Fusion-360-Bauanleitung exportieren.">
+<meta name="theme-color" content="#0b0b0d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{ "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/controls/OrbitControls.js": "./vendor/OrbitControls.js"
+} }
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <span class="brand-text"><b>Namensschild</b><span>Konfigurator</span></span>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn ghost" id="btn-reset" type="button" title="Auf Werkseinstellung zurücksetzen">Zurücksetzen</button>
+    <button class="btn accent" id="btn-export" type="button">Export</button>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- ================= VIEWPORT ================= -->
+  <section class="viewport" id="viewport">
+    <canvas id="scene"></canvas>
+
+    <div class="vp-overlay vp-top">
+      <div class="chipbar" id="measure-chips"></div>
+    </div>
+
+    <div class="vp-overlay vp-bottom">
+      <div class="warnbar" id="warnbar"></div>
+      <div class="viewtools">
+        <div class="seg" role="group" aria-label="Ansicht">
+          <button type="button" data-view="front">Vorne</button>
+          <button type="button" data-view="iso" class="on">Schräg</button>
+          <button type="button" data-view="side">Seite</button>
+          <button type="button" data-view="back">Hinten</button>
+        </div>
+        <button type="button" class="icobtn on" id="btn-light" title="LED-Simulation an/aus">LED</button>
+        <button type="button" class="icobtn on" id="btn-wall" title="Wand einblenden">Wand</button>
+        <button type="button" class="icobtn" id="btn-split" title="Teilungslinien einblenden">Teilung</button>
+      </div>
+    </div>
+
+    <div class="loader" id="loader"><div class="spin"></div><span>Schriften werden geladen …</span></div>
+  </section>
+
+  <!-- ================= PANEL ================= -->
+  <aside class="panel" id="panel">
+    <nav class="tabs" id="tabs" role="tablist"></nav>
+    <div class="panel-scroll" id="panel-scroll"></div>
+  </aside>
+</main>
+
+<!-- ================= EXPORT DIALOG ================= -->
+<dialog class="modal" id="export-modal">
+  <div class="modal-head">
+    <h2>Export für Fusion 360</h2>
+    <button class="btn ghost small" id="btn-close-export" type="button">Schließen</button>
+  </div>
+  <div class="modal-tools">
+    <button class="btn accent" id="btn-copy" type="button">Text kopieren</button>
+    <button class="btn" id="btn-dl-json" type="button">JSON laden</button>
+    <button class="btn" id="btn-dl-svg" type="button">SVG der Konturen</button>
+    <button class="btn" id="btn-dl-txt" type="button">Anleitung .txt</button>
+    <span class="copyhint" id="copyhint"></span>
+  </div>
+  <textarea class="modal-body" id="export-text" readonly spellcheck="false"></textarea>
+</dialog>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
